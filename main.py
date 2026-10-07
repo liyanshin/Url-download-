@@ -40,7 +40,12 @@ app = FastAPI()
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-COOKIE_ARGS = ["--cookies", COOKIES_FILE] if COOKIES_FILE else []
+COOKIES_FILE = os.getenv("COOKIES_FILE")                 # optional, e.g. for Instagram
+_cookies_b64 = os.getenv("COOKIES_B64")                  # cookies.txt, base64-encoded
+if _cookies_b64 and not COOKIES_FILE:
+    COOKIES_FILE = "/tmp/cookies.txt"
+    with open(COOKIES_FILE, "wb") as f:
+        f.write(base64.b64decode(_cookies_b64))
 
 
 # --------------------------------------------------------------- helpers ----
